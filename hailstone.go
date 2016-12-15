@@ -1,3 +1,8 @@
+// Caitlin Schäffers
+// Programmeertalen
+// University of Amsterdam
+//
+// Hailstone sequence functions made with go routines.
 
 package main
 
@@ -7,10 +12,6 @@ import (
 	"strconv"
 )
 
- // PRODUCER MAKEN, die stuurt berekening naar hailstone consumer
-
-  // MAIN die roept producer aan
-
 func hailstone_producer(n int) {
 	counter := 1
 	done := make(chan int)
@@ -19,8 +20,10 @@ func hailstone_producer(n int) {
 	var findNextHail func(n int)
 
 	findNextHail = func(n int) {
+		// put all the calculates numbers in sequence in the channel
 		c <- n
 		if n == 1 {
+			// close the channel and signal that we're done when 1 is found
 			close(c)
 			done <- 1
 		} else if n % 2 == 0 {
@@ -32,7 +35,9 @@ func hailstone_producer(n int) {
 
 	go findNextHail(n)
 
+	// make anonymous function that catches the values put in the channels
 	go func () {
+		// count how many routines are still running
 		for counter != 0 {
 			select {
 
@@ -51,8 +56,10 @@ func hailstone_producer(n int) {
 }
 
 func hailstone_consumer(c chan int) {
+	// make var to catch user input
     var dummy string
 
+    // iterate over all values in channel
     for n := range c {
         fmt.Println("Press Enter to see the next value.")
         fmt.Scanln(&dummy)
@@ -61,11 +68,13 @@ func hailstone_consumer(c chan int) {
 }
 
 func main() {
+	// if user hasn't given a start value for the sequence, exit progam
 	if len(os.Args) != 2 {
 		os.Exit(1)
 		fmt.Println("Give a start number!")
 	}
 
+	// call the producer with the start value
 	arg, err := strconv.Atoi(os.Args[1])
 	if err == nil {
 		hailstone_producer(arg)

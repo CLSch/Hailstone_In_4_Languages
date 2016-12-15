@@ -1,5 +1,12 @@
 #! usr/bin/env python3
 
+# Caitlin Schäffers
+# Programmeertalen
+# University of Amsterdam
+#
+# Hailstone Sequence functions made with generators.
+
+# hailstone without recursion
 def hailstone(n):
     yield n
     while n != 1:
@@ -9,6 +16,7 @@ def hailstone(n):
             n = n * 3 + 1
         yield n
 
+# hailstone with recursion
 def hailstone_rec(n):
     yield n
     if n != 1:
