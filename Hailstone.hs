@@ -1,3 +1,7 @@
+-- Caitlin Schäffers
+-- Programmeertalen
+-- University of Amsterdam
+
 module Hailstone
 
 where
