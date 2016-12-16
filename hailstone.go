@@ -12,46 +12,18 @@ import (
 	"strconv"
 )
 
-func hailstone_producer(n int) {
-	counter := 1
-	done := make(chan int)
-	c := make(chan int)
-	seq := make(chan int)
-	var findNextHail func(n int)
-
-	findNextHail = func(n int) {
-		// put all the calculates numbers in sequence in the channel
+func hailstone_producer(n int, c chan int){
+	// put all the calculates numbers in sequence in the channel
+	for n > 1 {
 		c <- n
-		if n == 1 {
-			// close the channel and signal that we're done when 1 is found
-			close(c)
-			done <- 1
-		} else if n % 2 == 0 {
-			seq <- (n / 2)
+		if n % 2 == 0 {
+			n /= 2
 		} else {
-			seq <- (n * 3 + 1)
+			n = n * 3 + 1
 		}
 	}
-
-	go findNextHail(n)
-
-	// make anonymous function that catches the values put in the channels
-	go func () {
-		// count how many routines are still running
-		for counter != 0 {
-			select {
-
-			case n := <-seq:
-				counter++
-				go findNextHail(n)
-
-			case <- done:
-				counter--
-			}
-		}
-	}()
-
-	hailstone_consumer(c)
+	// close the channel and signal that we're done when 1 is found
+	close(c)
 	fmt.Println("Done Producing!")
 }
 
@@ -68,6 +40,8 @@ func hailstone_consumer(c chan int) {
 }
 
 func main() {
+	c := make(chan int)
+
 	// if user hasn't given a start value for the sequence, exit progam
 	if len(os.Args) != 2 {
 		os.Exit(1)
@@ -75,8 +49,8 @@ func main() {
 	}
 
 	// call the producer with the start value
-	arg, err := strconv.Atoi(os.Args[1])
-	if err == nil {
-		hailstone_producer(arg)
-	}
+	arg, _ := strconv.Atoi(os.Args[1])
+	
+	go hailstone_producer(arg, c)
+	hailstone_consumer(c)
 }
