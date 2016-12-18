@@ -17,4 +17,8 @@ where
     hailstone' = (!!) hailstoneMemo
 
     hailstoneMemo :: [[Int]]
-    hailstoneMemo = (map hailstone [0 ..])
+    hailstoneMemo = (map all_hail [0 ..])
+        where all_hail 1 = [1]
+              all_hail n
+                | even n = n : hailstone' (n `div` 2)
+                | otherwise = n : hailstone' (n * 3 + 1)
